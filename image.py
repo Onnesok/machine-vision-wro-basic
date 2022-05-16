@@ -17,12 +17,13 @@ while True:
     imageFrame = cv2.resize(imageFrame, (700,700))
 
     hsvFrame = cv2.cvtColor(imageFrame, cv2.COLOR_BGR2HSV)   # BGR(RGB color space) to HSV(hue-saturation-value)
+
     #######################################
     rows, cols, success = imageFrame.shape
     center_x = int(rows / 2)
     center_y = int(rows / 2)
-    cv2.line(imageFrame, (center_x+100, 0), (center_x+100, 1300), (24, 81, 200), 2)
-    cv2.line(imageFrame, (center_x-100, 0), (center_x-100, 1300), (24, 81, 200), 2)
+    cv2.line(imageFrame, (center_x+100, 0), (center_x+100, 1300), (24, 81, 200), 1)
+    cv2.line(imageFrame, (center_x-100, 0), (center_x-100, 1300), (24, 81, 200), 1)
     #######################################
 
 
