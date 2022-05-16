@@ -7,6 +7,9 @@ webcam = cv2.VideoCapture(0)  #capture
 pTime = 0
 cTime = 0
 
+count = 0
+cnt = 0
+
 while True:
     # medium_bx = 0
     # medium_gx = 0
@@ -29,7 +32,6 @@ while True:
 
     def red_op():
         medium_rx = 0
-        cache = 0
         # Setting range
         red_lower = np.array([136, 87, 111], np.uint8)
         red_upper = np.array([180, 255, 255], np.uint8)
@@ -42,17 +44,22 @@ while True:
 
         contours, hierarchy = cv2.findContours(red_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         if len(contours)!=0:
+            flag_r = 0
             for contour in contours:
                 area = cv2.contourArea(contour)
                 if area >500:
                     x, y, w, h = cv2.boundingRect(contour)
                     if w*h >= 8000:
-                        cv2.rectangle(imageFrame, (x, y), (x + w, y + h), (0, 0, 255), 3)
+                        flag_r += 1
+                        if flag_r < 2:
+                            cv2.rectangle(imageFrame, (x, y), (x + w, y + h), (0, 0, 255), 3)
 
-                        cv2.putText(imageFrame, "Red Colour", (x, y),cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255))
+                            cv2.putText(imageFrame, "Red Colour", (x, y),cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255))
 
-                        medium_rx = int((x + x+w) / 2)
-                        medium_ry = int((y + y+h) / 2)
+                            medium_rx = int((x + x+w) / 2)
+                            medium_ry = int((y + y+h) / 2)
+                        else:
+                            continue
 
         if medium_rx > center_x+100:
             cv2.putText(imageFrame, "Red right= "+ str(medium_rx), (260,80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0))
@@ -85,12 +92,16 @@ while True:
                 if area >500:
                     x, y, w, h = cv2.boundingRect(contour)
                     if w*h >= 8000:
-                        cv2.rectangle(imageFrame, (x, y), (x + w, y + h), (0, 255, 0), 3)
+                        flag_g += 1
+                        if flag_g < 2:
+                            cv2.rectangle(imageFrame, (x, y), (x + w, y + h), (0, 255, 0), 3)
 
-                        cv2.putText(imageFrame, "Green Colour", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0))
+                            cv2.putText(imageFrame, "Green Colour", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0))
 
-                        medium_gx = int((x + x+w) / 2)
-                        medium_gy = int((y + y+h) / 2)
+                            medium_gx = int((x + x+w) / 2)
+                            medium_gy = int((y + y+h) / 2)
+                        else:
+                            continue
             
         if medium_gx > center_x+100:
             cv2.putText(imageFrame, "Green right= "+ str(medium_gx), (260,20), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0))
@@ -104,6 +115,8 @@ while True:
 
     def blue_op():
         medium_bx = 0
+        flag_b = 0
+        global count
         # blue_lower = np.array([94, 80, 2], np.uint8)       ### Overlaps with green 
         # blue_upper = np.array([120, 255, 255], np.uint8)
         blue_lower = np.array([100,70,2], np.uint8)   ### better
@@ -122,12 +135,17 @@ while True:
                 if area >500:
                     x, y, w, h = cv2.boundingRect(contour)
                     if w*h >= 8000:
-                        cv2.rectangle(imageFrame, (x, y), (x + w, y + h), (255, 0, 0), 2)
+                        flag_b += 1
+                        if flag_b < 2:
+                            cv2.rectangle(imageFrame, (x, y), (x + w, y + h), (255, 0, 0), 2)
 
-                        cv2.putText(imageFrame, "Blue Colour", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 0, 0))
+                            cv2.putText(imageFrame, "Blue Colour", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 0, 0))
+                            count+=1
 
-                        medium_bx = int((x + x+w) / 2)
-                        medium_by = int((y + y+h) / 2)
+                            medium_bx = int((x + x+w) / 2)
+                            medium_by = int((y + y+h) / 2)
+                        else:
+                            continue
 
         if medium_bx > center_x+100:
             cv2.putText(imageFrame, "Blue right= " + str(medium_bx), (260,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0))
@@ -147,6 +165,11 @@ while True:
         fps = 1/(cTime - pTime)
         pTime = cTime
         cv2.putText(imageFrame, str(int(fps)), (10,70), cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 0))
+
+        if count % 270 == 0 and count != 0:
+            cnt += 1
+
+        cv2.putText(imageFrame, str(cnt), (30, 200), cv2.FONT_HERSHEY_SCRIPT_COMPLEX, 3, (255, 255, 0))
 
         if cv2.waitKey(10) & 0xFF == ord('q'):
             cv2.destroyAllWindows()
